@@ -14,7 +14,7 @@ RNA_dict = {
     "ACU" : "Thr", "ACC" : "Thr", "ACA" : "Thr", "ACG" : "Thr",
     "GCU" : "Ala", "GCC" : "Ala", "GCA" : "Ala", "GCG" : "Ala",
     "UAU" : "Tyr", "UAC" : "Tyr", "UAA" : "Stop", "UAG" : "Stop",
-    "CAU" : "His", "CAC" : "His", "CAA" : "Gin", "CAG" : "Gin",
+    "CAU" : "His", "CAC" : "His", "CAA" : "Gln", "CAG" : "Gln",
     "AAU" : "Asn", "AAC" : "Asn", "AAA" : "Lys", "AAG" : "Lys",
     "GAU" : "Asp", "GAC" : "Asp", "GAA" : "Glu", "GAG" : "Glu",
     "UGU" : "Cys", "UGC" : "Cys", "UGA" : "Stop", "UGG" : "Trp",
@@ -33,13 +33,20 @@ DNA_dict = {
     "ACT" : "Thr", "ACC" : "Thr", "ACA" : "Thr", "ACG" : "Thr",
     "GCT" : "Ala", "GCC" : "Ala", "GCA" : "Ala", "GCG" : "Ala",
     "TAT" : "Tyr", "TAC" : "Tyr", "TAA" : "Stop", "TAG" : "Stop",
-    "CAT" : "His", "CAC" : "His", "CAA" : "Gin", "CAG" : "Gin",
+    "CAT" : "His", "CAC" : "His", "CAA" : "Gln", "CAG" : "Gln",
     "AAT" : "Asn", "AAC" : "Asn", "AAA" : "Lys", "AAG" : "Lys",
     "GAT" : "Asp", "GAC" : "Asp", "GAA" : "Glu", "GAG" : "Glu",
     "TGT" : "Cys", "TGC" : "Cys", "TGA" : "Stop", "TGG" : "Trp",
     "CGT" : "Arg", "CGC" : "Arg", "CGA" : "Arg", "CGG" : "Arg",
     "AGT" : "Ser", "AGC" : "Ser", "AGA" : "Arg", "AGG" : "Arg",
     "GGT" : "Gly", "GGC" : "Gly", "GGA" : "Gly", "GGG" : "Gly"
+}
+
+Amino_dict = {
+    "Ala" : "A", "Asp" : "D", "Arg" : "R", "His" : "H", "Lys" : "K",
+    "Glu" : "E", "Ser" : "S", "Thr" : "T", "Asn" : "N", "Gln" : "Q",
+    "Cys" : "C", "Gly" : "G", "Pro" : "P", "Val" : "V", "Ile" : "I",
+    "Leu" : "L", "Met" : "M", "Phe" : "F", "Tyr" : "Y", "Trp" : "W"
 }
 
 Start_codon_DNA = "ATG"
@@ -140,16 +147,42 @@ class Sequence_analizer():
                     break
             template_sequence = template_sequence[3:]
 
-    def save_result_as_files(self):
+    def save_result_as_FASTA_format(self):
         self.find_all_possible_transcription()
-        for i in range(len(self.transcriptable_sequences)):
-            new_filename = self.filename.split(".")[0] + "_" + str(i + 1) + ".txt"
-            res_file = open(new_filename, 'w')
-            res_file.write("GENETIC SEQUENCE\n")
-            res_file.write(self.transcriptable_sequences[i])
-            res_file.write("\n\nPROTEIN SEQUENCE\n")
-            res_file.write(str(self.protein[i]))
-            res_file.close()
+        new_file_for_gene = open(self.filename.split(".")[0] + "_GENE.fasta", 'w')
+        new_file_for_protein = open(self.filename.split(".")[0] + "_PROTEIN.fasta", 'w')
+
+        for i, el in enumerate(self.transcriptable_sequences):
+            new_file_for_gene.write(">Sequence " + str(i) + "\n")
+            new_file_for_gene.write(self.gene_sequence_into_fasta(el) + "\n\n")
+
+        for i, el in enumerate(self.protein):
+            new_file_for_protein.write(">Sequence " + str(i) + "\n")
+            new_file_for_protein.write(self.protein_sequence_into_fasta(el) + "\n\n")
+
+        new_file_for_gene.close()
+        new_file_for_protein.close()
+
+    def protein_sequence_into_fasta(self, sequence):
+        fasta = ""
+        for el in sequence:
+            fasta += Amino_dict[el]
+        retval = ""
+        while len(fasta) > 70:
+            retval += fasta[:70]
+            retval += "\n"
+            fasta = fasta[70:]
+        retval += fasta
+        return retval
+
+    def gene_sequence_into_fasta(self, sequence):
+        retval = ""
+        while len(sequence) > 70:
+            retval += sequence[:70]
+            retval += "\n"
+            sequence = sequence[70:]
+        retval += sequence
+        return retval
 
     def find_all_possible_transcription(self):
         if self.mode == "DNA":
