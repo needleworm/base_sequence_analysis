@@ -19,12 +19,18 @@ None
 > import sequence_analizer as sa
 > analizer = sa.Sequence_analizer("test.txt")
 
+### find all possible genes and proteins
+> analizer.find_all_possible_transcription()
+
 ### find all possible transcriptable sequences
 > analizer.find_genes()
 
 ### find all possible proteins
-> analizer.find_all_possible_proteins()
+> analizer.find_all_possible_proteins(
 
+### Draw the gene and protein information
+> analizer.protein
+> analizer.transcriptable_sequences
 
 ### find all and save result
 > analizer.save_result_as_files()

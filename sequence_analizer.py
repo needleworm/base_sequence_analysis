@@ -69,12 +69,13 @@ class Sequence_analizer():
         file.close()
 
     def find_all_possible_proteins(self):
+        if not self.transcriptable_sequences:
+            self.find_genes()
         for seq in self.transcriptable_sequences:
             protein = self.translation(seq)
             if protein not in self.protein:
                 self.protein.append(protein)
         return self.protein
-
 
     def translation(self, refined_sequence):
         if self.mode == "DNA":
@@ -82,16 +83,18 @@ class Sequence_analizer():
         else:
             dict = RNA_dict
         Protein_sequence = []
+        Gene_sequence = ""
         while refined_sequence:
             codon = refined_sequence[:3]
             refined_sequence = refined_sequence[3:]
             if codon not in dict:
-                return Protein_sequence
+                return Protein_sequence, Gene_sequence
             amino_acid = dict[codon]
             if amino_acid == "Stop":
-                return Protein_sequence
+                return Protein_sequence, Gene_sequence
             Protein_sequence.append(amino_acid)
-        return Protein_sequence
+            Gene_sequence += codon
+        return Protein_sequence, Gene_sequence
 
     @staticmethod
     def transcription(self, sequence):
@@ -138,8 +141,7 @@ class Sequence_analizer():
             template_sequence = template_sequence[3:]
 
     def save_result_as_files(self):
-        self.find_genes()
-        self.find_all_possible_proteins()
+        self.find_all_possible_transcription()
         for i in range(len(self.transcriptable_sequences)):
             new_filename = self.filename.split(".")[0] + "_" + str(i + 1) + ".txt"
             res_file = open(new_filename, 'w')
@@ -148,3 +150,22 @@ class Sequence_analizer():
             res_file.write("\n\nPROTEIN SEQUENCE\n")
             res_file.write(str(self.protein[i]))
             res_file.close()
+
+    def find_all_possible_transcription(self):
+        if self.mode == "DNA":
+            start_codon = Start_codon_DNA
+        else:
+            start_codon = Start_codon_RNA
+
+        num_start_codons = self.sequence.count(start_codon)
+        template_sequence = self.sequence
+        for i in range(num_start_codons):
+            template_sequence = template_sequence[template_sequence.index(start_codon):]
+            protein, gene = self.translation(template_sequence)
+            if gene not in self.transcriptable_sequences:
+                self.protein.append(protein)
+                self.transcriptable_sequences.append(gene)
+            if len(template_sequence) > 3:
+                template_sequence = template_sequence[3:]
+            else:
+                return
