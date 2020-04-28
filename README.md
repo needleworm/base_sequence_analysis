@@ -33,7 +33,7 @@ None
 > analizer.transcriptable_sequences
 
 ### find all and save result
-> analizer.save_result_as_files()
+> analizer.save_result_as_FASTA_format()
 
 Then results are save as separate files.
 
