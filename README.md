@@ -17,6 +17,7 @@ None
 ## How to use
 
 > import sequence_analizer as sa
+
 > analizer = sa.Sequence_analizer("test.txt")
 
 ### find all possible genes and proteins
