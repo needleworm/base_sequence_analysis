@@ -55,7 +55,7 @@ Stop_codons_DNA = ["TAA", "TAG", "TGA"]
 Stop_codons_RNA = ["UAA", "UAG", "UGA"]
 
 
-class Sequence_analizer():
+class sequence_analizer():
     def __init__(self, sequence_filename, mode="DNA"):
         self.mode = mode
         self.filename = sequence_filename
